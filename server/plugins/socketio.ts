@@ -2,6 +2,7 @@ import type { NitroApp } from "nitropack";
 import { Server as Engine } from "engine.io";
 import { Server } from "socket.io";
 import { defineEventHandler } from "h3";
+import { handleConnection } from "../socketHandler";
 
 export default defineNitroPlugin((nitroApp: NitroApp) => {
   const engine = new Engine();
@@ -10,7 +11,7 @@ export default defineNitroPlugin((nitroApp: NitroApp) => {
   io.bind(engine);
 
   io.on("connection", (socket) => {
-    // ...
+    handleConnection(socket);
   });
 
   nitroApp.router.use("/socket.io/", defineEventHandler({
