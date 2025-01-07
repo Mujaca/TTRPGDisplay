@@ -1,9 +1,10 @@
 import { moveFile } from "move-file";
 import mime from 'mime-types'
 import fs from "fs";
+import { readFiles } from "h3-formidable";
 
 export default defineEventHandler(async (event) => {
-    const { files } = event.context.formidable;
+    const { fields, files, form } = await readFiles(event, {})
     const result = [];
     
     for(let key in files) {

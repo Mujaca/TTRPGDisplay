@@ -1,66 +1,136 @@
 <template>
-    <div class="data-container">
-        <img v-if="currentImage" :src="currentImage" alt="image" />
-        <div>
-            <p>a</p>
-        </div>
-    </div>
+	<div class="data-container">
+		<img
+			v-if="currentImage"
+			:src="currentImage"
+			alt="image" />
+		<div class="information-container">
+			<h1>{{ currentTitle }}</h1>
+			<p>{{ currentDescription }}</p>
+		</div>
+	</div>
+	<div
+		class="speech-bubble"
+		v-if="currentTipTitle || currentTipDescription">
+		<h1>{{ currentTipTitle }}</h1>
+		<p>{{ currentTipDescription }}</p>
+	</div>
+	<img
+		class="background-image"
+		v-if="currentImage"
+		:src="currentImage"
+		alt="image" />
 </template>
 
 <script setup lang="ts">
-import { useSocketStore } from '~/stores/socket'
+import { useSocketStore } from '~/stores/socket';
 definePageMeta({
-  layout: 'display'
-})
-const store = useSocketStore()
+	layout: 'display',
+});
+const store = useSocketStore();
 
 const currentImage = ref();
 const currentAudio = ref();
 const currentTitle = ref();
 const currentDescription = ref();
+const currentTipTitle = ref();
+const currentTipDescription = ref();
 
 store.socket.onmessage = (event) => {
-  const data = JSON.parse(event.data)
-  switch (data.type) {
-    case "image":
-        currentImage.value = data.data
-    break;
-    case "audio":
-        currentAudio.value = data.data
-    break;
-    case "title": 
-        currentTitle.value = data.data
-    break;
-    case "description":
-        currentDescription.value = data.data
-    break;
-    case "multiple": 
-        currentImage.value = data.data.image
-        currentAudio.value = data.data.audio
-        currentTitle.value = data.data.title
-        currentDescription.value = data.data.description
-    break;
-    default:
-        break;
-  }
-}
+	const data = JSON.parse(event.data);
+	switch (data.type) {
+		case 'image':
+			currentImage.value = data.data;
+			break;
+		case 'audio':
+			currentAudio.value = data.data;
+			break;
+		case 'title':
+			currentTitle.value = data.data;
+			break;
+		case 'description':
+			currentDescription.value = data.data;
+			break;
+		case 'multiple':
+			currentImage.value = data.data.image;
+			currentAudio.value = data.data.audio;
+			currentTitle.value = data.data.title;
+			currentDescription.value = data.data.description;
+			currentTipTitle.value = data.data.tipTitle;
+			currentTipDescription.value = data.data.tipDescription;
+			break;
+		default:
+			break;
+	}
+};
 </script>
 
 <style lang="scss" scoped>
 .data-container {
+	padding: 0.3rem;
+	min-width: 100vw;
+	height: 100%;
+	width: 100%;
 
+	display: flex;
+	flex-direction: column-reverse;
+	align-items: center;
+
+	.information-container {
+		font-family: 'Shadows into Light';
+
+		h1 {
+			text-align: center;
+			font-size: 2rem;
+			font-weight: bold;
+			margin: 0;
+		}
+
+		p {
+			margin: 0;
+		}
+	}
+
+	img {
+		padding: 0.8rem;
+		width: 98vh;
+		height: auto;
+		border-radius: 32px;
+	}
+}
+
+.speech-bubble {
+	position: fixed;
+	background: #0ecd9d;
+	border-radius: 0.4em;
+	bottom: 125px;
+	right: 15px;
+	z-index: 200;
+	padding: 0.4rem;
+
+	&:after {
+		content: '';
+		position: absolute;
+		bottom: 0;
+		left: 50%;
+		width: 0;
+		height: 0;
+		border: 50px solid transparent;
+		border-top-color: #0ecd9d;
+		border-bottom: 0;
+		border-right: 0;
+		margin-left: 75px;
+		margin-bottom: -25px;
+	}
+}
+.background-image {
+    position: fixed;
+    top: 0;
+    left: 0;
     padding: .3rem;
-    width: 100%;
-    height: 100%;
-
-    display: flex;
-    flex-direction: row;
-
-    img {
-        padding: .8rem;
-        width: 75%;
-        height: 75%;
-        transform: translate(0%, 0%);
-    }
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    filter: blur(32px) brightness(0.4);
 }
 </style>
