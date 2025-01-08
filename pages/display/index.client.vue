@@ -165,6 +165,6 @@ onMounted(() => {
     width: 100vw;
     height: 100vh;
     z-index: -1;
-    filter: blur(32px) brightness(0.4);
+    filter: blur(48px) brightness(0.3);
 }
 </style>
