@@ -118,6 +118,7 @@ onMounted(() => {
 		}
 
 		p {
+            text-align: center;
 			margin: 0;
 		}
 	}
