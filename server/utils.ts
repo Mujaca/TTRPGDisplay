@@ -2,8 +2,8 @@ let currentImage: string | null = '/api/file/base.png';
 let currentAudio: string | null = null;
 let currentTitle: string | null = 'Wilkommen!';
 let currentDescription: string | null = 'Es geht gleich los!';
-let currentTipTitle: string | null = 'Euer GM hier.';
-let currentTipDescription: string | null = 'Hier gibts immer eine Kleinigkeit nur für euch';
+let currentTipTitle: string | null = 'Hier gibt es GM Hinweise.';
+let currentTipDescription: string | null = 'Also regelmäßig aufpassen, ob hier nicht etwas interessantes für euch steht. Man weiß ja nie.';
 
 export function writeImage(image: string) {
 	currentImage = '/api/file/' + image;

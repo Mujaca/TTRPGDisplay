@@ -1,5 +1,13 @@
 <template>
 	<div class="data-container">
+        <div class="information-container">
+			<h1>{{ currentTitle }}</h1>
+			<p>{{ currentDescription }}</p>
+		</div>
+		<img
+			v-if="currentImage"
+			:src="currentImage"
+			alt="image" />
         <audio
             :src="currentAudio"
             ref="audio"
@@ -7,14 +15,6 @@
             loop
             style="display: hidden;"
             />
-		<img
-			v-if="currentImage"
-			:src="currentImage"
-			alt="image" />
-		<div class="information-container">
-			<h1>{{ currentTitle }}</h1>
-			<p>{{ currentDescription }}</p>
-		</div>
 	</div>
 	<div
 		class="speech-bubble"
@@ -60,11 +60,9 @@ store.socket.onmessage = (event) => {
 		case 'description':
 			currentDescription.value = data.data;
 			break;
-        case 'tipTitle':
-            currentTipTitle.value = data.data;
-            break;
-        case 'tipDescription':
-            currentTipDescription.value = data.data;
+        case 'tip':
+            currentTipTitle.value = data.data.title;
+            currentTipDescription.value = data.data.description;
             break;
         case 'resetTip':
             currentTipTitle.value = '';
@@ -105,8 +103,9 @@ onMounted(() => {
 	width: 100%;
 
 	display: flex;
-	flex-direction: column-reverse;
+	flex-direction: column;
 	align-items: center;
+    justify-content: center;
 
 	.information-container {
 		font-family: 'Shadows into Light';
@@ -126,6 +125,7 @@ onMounted(() => {
 	img {
 		padding: 0.8rem;
 		width: 98vh;
+        max-width: 90vh;
 		height: auto;
 		border-radius: 32px;
 	}
@@ -139,6 +139,7 @@ onMounted(() => {
 	right: 15px;
 	z-index: 200;
 	padding: 0.4rem;
+    max-width: 20rem;
 
 	&:after {
 		content: '';
