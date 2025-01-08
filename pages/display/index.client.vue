@@ -1,5 +1,12 @@
 <template>
 	<div class="data-container">
+        <audio
+            :src="currentAudio"
+            ref="audio"
+            autoplay
+            loop
+            style="display: hidden;"
+            />
 		<img
 			v-if="currentImage"
 			:src="currentImage"
@@ -36,6 +43,8 @@ const currentDescription = ref();
 const currentTipTitle = ref();
 const currentTipDescription = ref();
 
+const audio = ref();
+
 store.socket.onmessage = (event) => {
 	const data = JSON.parse(event.data);
 	switch (data.type) {
@@ -51,18 +60,41 @@ store.socket.onmessage = (event) => {
 		case 'description':
 			currentDescription.value = data.data;
 			break;
+        case 'tipTitle':
+            currentTipTitle.value = data.data;
+            break;
+        case 'tipDescription':
+            currentTipDescription.value = data.data;
+            break;
+        case 'resetTip':
+            currentTipTitle.value = '';
+            currentTipDescription.value = '';
+        break;
 		case 'multiple':
-			currentImage.value = data.data.image;
-			currentAudio.value = data.data.audio;
-			currentTitle.value = data.data.title;
-			currentDescription.value = data.data.description;
-			currentTipTitle.value = data.data.tipTitle;
-			currentTipDescription.value = data.data.tipDescription;
+			if(data.data.image) currentImage.value = data.data.image;
+			if(data.data.audio) currentAudio.value = data.data.audio;
+			if(data.data.title) currentTitle.value = data.data.title;
+			if(data.data.description) currentDescription.value = data.data.description;
+			if(data.data.tipTitle) currentTipTitle.value = data.data.tipTitle;
+			if(data.data.tipDescription) currentTipDescription.value = data.data.tipDescription;
 			break;
+        case 'audioPause':
+            audio.value.pause();
+            break;
+        case 'audioPlay':
+            audio.value.play();
+            break;
 		default:
 			break;
 	}
 };
+
+onMounted(() => {
+    console.log(audio.value);
+    audio.value.addEventListener('canplay', () => {
+        audio.value.play();
+    });
+})
 </script>
 
 <style lang="scss" scoped>
