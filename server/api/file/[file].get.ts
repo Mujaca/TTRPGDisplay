@@ -8,7 +8,7 @@ export default eventHandler(async (event) => {
     const fileNameEnding = fileName.split('.').pop();
     if(fileNameEnding === "env") return "File not found";
 
-    const fileBuffer = fs.readFileSync(process.env.storage + fileName);
+    const fileBuffer = fs.readFileSync(process.env.storage + decodeURIComponent(fileName));
     return new Response(fileBuffer, {
         headers: {
             "Content-Type": mime.contentType(fileName) as string,
