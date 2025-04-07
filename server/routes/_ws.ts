@@ -1,4 +1,4 @@
-import { getAudio, getDescription, getImage, getTipDescription, getTipTitle, getTitle } from "../utils";
+import { getAudio, getDescription, getEnemies, getImage, getTipDescription, getTipTitle, getTitle } from "../utils";
 
 let peers = new Set();
 export const broadcast = (data:any) => {
@@ -17,7 +17,8 @@ export default defineWebSocketHandler({
             title: getTitle(),
             description: getDescription(),
             tipTitle: getTipTitle(),
-            tipDescription: getTipDescription()
+            tipDescription: getTipDescription(),
+            enemies: getEnemies(),
         }}));
 	},
 	message(peer, message) {

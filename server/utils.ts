@@ -4,6 +4,7 @@ let currentTitle: string | null = 'Wilkommen!';
 let currentDescription: string | null = 'Es geht gleich los!';
 let currentTipTitle: string | null = 'Hier gibt es GM Hinweise.';
 let currentTipDescription: string | null = 'Also regelmäßig aufpassen, ob hier nicht etwas interessantes für euch steht. Man weiß ja nie.';
+let enemyList: Enemy[] = [];
 
 export function writeImage(image: string) {
 	currentImage = '/api/file/' + image;
@@ -27,6 +28,10 @@ export function writeTipTitle(tipTitle: string) {
 
 export function writeTipDescription(tipDescription: string) {
 	currentTipDescription = tipDescription;
+}
+
+export function writeEnemies(enemies: Enemy[]) {
+    enemyList = enemies;
 }
 
 export function getImage() {
@@ -53,6 +58,10 @@ export function getTipDescription() {
     return currentTipDescription;
 }
 
+export function getEnemies() {
+    return enemyList;
+}
+
 export function reset() {
     currentImage = '/api/file/base.png';
     currentAudio = null;
@@ -60,4 +69,5 @@ export function reset() {
     currentDescription = 'Es geht gleich los!';
     currentTipTitle = 'Euer GM hier.';
     currentTipDescription = 'Hier gibts immer eine Kleinigkeit nur für euch';
+    enemyList = [];
 }
