@@ -6,7 +6,7 @@
 		<div class="battle-container">
 			<h1>Kampfreinfolge</h1>
 			<div class="order">
-                <p v-for="(enemy, index) in enemies" :key="index"> {{ index +1 }}. {{ enemy.name }} ({{ enemy.damage }} Schaden) </p>
+                <p v-for="(enemy, index) in enemies" :key="index" :class="index == currentTurn ? 'active' : enemy.hp < enemy.maxHp * 0.2 ? 'low' : ''"> {{ index +1 }}. {{ enemy.name }} ({{ enemy.damage }} Schaden) </p>
 			</div>
 		</div>
 	</div>
@@ -188,6 +188,14 @@ onMounted(() => {
 		margin-left: 75px;
 		margin-bottom: -25px;
 	}
+}
+
+.low {
+    color: #A5200B;
+}
+
+.active {
+    color: #ffcf40
 }
 
 .turn-change {
