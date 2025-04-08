@@ -1,13 +1,14 @@
 import { broadcast } from "~/server/routes/_ws";
+import { writeEnemies } from "~/server/utils";
 
 export default defineEventHandler(async (event) => {
-    const body = JSON.parse(await readBody(event));
+	const body = JSON.parse(await readBody(event));
+    writeEnemies(body);
 
     broadcast({
-        type: 'turn_change',
+        type: 'enemy_list',
         data: {
-            currentRound: body.currentTurn,
-            currentTurn: body.currentEnemy
+            enemies: body
         }
     })
 

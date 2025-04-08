@@ -6,10 +6,7 @@
 		<div class="battle-container">
 			<h1>Kampfreinfolge</h1>
 			<div class="order">
-				<p> 1. Spieler (20 Schaden) </p>
-				<p> 2. Gegner (30 Schaden) </p>
-				<p> 3. Spieler (0 Schaden) </p>
-				<p> 4. Gegner (5 Schaden) </p>
+                <p v-for="(enemy, index) in enemies" :key="index"> {{ index +1 }}. {{ enemy.name }} ({{ enemy.damage }} Schaden) </p>
 			</div>
 		</div>
 	</div>
@@ -43,7 +40,9 @@ const currentTipTitle = ref();
 const currentTipDescription = ref();
 const showTurnChange = ref(false);
 const currentRound = ref(0);
+const currentTurn = ref(0);
 const showNewRound = ref(false);
+const enemies = ref([]);
 
 const audio = ref();
 
@@ -69,6 +68,7 @@ store.socket.onmessage = (event) => {
 			if (data.data.audio) currentAudio.value = data.data.audio;
 			if (data.data.tipTitle) currentTipTitle.value = data.data.tipTitle;
 			if (data.data.tipDescription) currentTipDescription.value = data.data.tipDescription;
+            if (data.data.enemies) enemies.value = data.data.enemies;
 			break;
 		case 'audioPause':
 			audio.value.pause();
@@ -76,25 +76,46 @@ store.socket.onmessage = (event) => {
 		case 'audioPlay':
 			audio.value.play();
 			break;
+        case 'turn_change':
+            showTurnChange.value = true;
+            currentTurn.value = data.data.currentTurn;
+            setTimeout(() => {
+                showTurnChange.value = false;
+            }, 6100);
+            break;
+        case 'round_change':
+            currentRound.value = data.data.currentRound;
+            showNewRound.value = true;
+            console.log(currentRound.value)
+            setTimeout(() => {
+                showNewRound.value = false;
+            }, 6100);
+            break;
+        case 'enemy_list':
+            enemies.value = data.data.enemies;
+            break;
+        case 'enemy_update':
+            const enemyIndex = enemies.value.findIndex((enemy) => enemy.id === data.data.id);
+            if (enemyIndex !== -1) {
+                enemies.value[enemyIndex]= data.data.data;
+            }
+            break;
+        case 'enemy_delete':
+            console.log("A")
+            const enemyToRemove = enemies.value.findIndex((enemy) => enemy.id === data.data.id);
+            if (enemyToRemove !== -1) {
+                enemies.value.splice(enemyToRemove, 1);
+            }
+            break;
 		default:
 			break;
 	}
 };
 
-function setNewRound() {
-	currentRound.value++;
-	showNewRound.value = true;
-	setTimeout(() => {
-		showNewRound.value = false;
-		setTimeout(setNewRound, 1);
-	}, 6100);
-}
-
 onMounted(() => {
 	audio.value.addEventListener('canplay', () => {
 		audio.value.play();
 	});
-	setNewRound();
 })
 </script>
 

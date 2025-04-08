@@ -6,8 +6,8 @@ export default defineEventHandler(async (event) => {
     broadcast({
         type: 'round_change',
         data: {
-            currentRound: body.currentEnemy,
-            currentturn: body.currentTurn
+            currentRound: body.currentTurn,
+            currentTurn: body.currentEnemy
         }
     })
 
