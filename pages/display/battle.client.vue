@@ -93,6 +93,11 @@ store.socket.onmessage = (event) => {
             break;
         case 'enemy_list':
             enemies.value = data.data.enemies;
+
+            if(currentTurn >= enemies.value.length) {
+                currentTurn.value = 0;
+            }
+            
             break;
         case 'enemy_update':
             const enemyIndex = enemies.value.findIndex((enemy) => enemy.id === data.data.id);
