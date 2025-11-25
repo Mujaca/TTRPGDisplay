@@ -125,8 +125,7 @@ onMounted(() => {
 
 	img {
 		padding: 0.8rem;
-		width: 98vh;
-        max-width: 90vh;
+        max-height: 90vh;
 		height: auto;
 		border-radius: 32px;
 	}
