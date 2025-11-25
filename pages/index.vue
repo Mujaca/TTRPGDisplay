@@ -1,5 +1,5 @@
 <template>
     <div>
-        b
+        Hier könnte Ihre Werbung stehen!
     </div>
 </template>
