@@ -84,6 +84,7 @@ store.socket.onmessage = (event) => {
             }, 6100);
             break;
         case 'round_change':
+            currentTurn.value = data.data.currentTurn;
             currentRound.value = data.data.currentRound;
             showNewRound.value = true;
             console.log(currentRound.value)
