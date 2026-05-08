@@ -10,6 +10,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "jsonwebtoken": "^9.0.3",
     "nuxt": "^4.4.2",
     "socket.io": "^4.8.3",
     "vue": "^3.5.32",
@@ -17,6 +18,7 @@
   },
   "packageManager": "yarn@1.22.21+sha1.1959a18351b811cdeedbd484a8f86c3cc3bbaf72",
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
     "prettier": "^3.8.3"
   }
 }
