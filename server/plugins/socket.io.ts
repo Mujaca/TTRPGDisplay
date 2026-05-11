@@ -2,29 +2,35 @@ import type { NitroApp } from "nitropack";
 import { Server as Engine } from "engine.io";
 import { Server } from "socket.io";
 import { defineEventHandler } from "h3";
+import { getRoom } from "../core/room/roomHandler";
+
+export let socketServer:Server;
 
 export default defineNitroPlugin((nitroApp: NitroApp) => {
     const engine = new Engine();
     const io = new Server();
+    socketServer = io;
 
     io.bind(engine);
 
     io.use((socket, next) => {
-        const room = socket.handshake.query.room;
-        console.log(room);
-        if(room !== undefined) {
-            socket.join(room);
+        const roomId = socket.handshake.query.room;
+
+        if (roomId === undefined || typeof roomId !== "string") {
+            next(new Error("No valid room"));
+            return;
+        }
+
+        const room = getRoom(roomId);
+
+        if (room === undefined) {
+            next(new Error("No valid room"));
+            return;
         }
 
         next();
-    })
 
-    io.on("connection", (socket) => {
-        console.log("connection");
-        socket.on("message", (data) => {
-            io.to("24eb81e4-b29e-4dfe-b53f-711d9d1e6e76").emit("message", "test")
-            console.log(data)
-        });
+        room.connectToRoom(socket);
     });
 
     nitroApp.router.use(
