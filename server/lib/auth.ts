@@ -5,6 +5,9 @@ import { admin } from "better-auth/plugins";
 
 export const auth = betterAuth({
     database: prismaAdapter(client, { provider: "postgresql" }),
+    experimental: {
+        joins: true
+    },
     baseURL: "http://localhost:3000/",
     emailAndPassword: { enabled: true },
     socialProviders: {

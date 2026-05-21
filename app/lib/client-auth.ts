@@ -1,8 +1,8 @@
 import { createAuthClient } from "better-auth/vue";
-import { sentinelClient } from "@better-auth/infra/client";
+import { admin } from "better-auth/plugins";
 
 export const authClient = createAuthClient({
     plugins: [
-        sentinelClient()
+        admin()
     ]
 });
