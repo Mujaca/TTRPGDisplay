@@ -10,6 +10,10 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@better-auth/infra": "^0.2.8",
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "better-auth": "^1.6.11",
     "jsonwebtoken": "^9.0.3",
     "nuxt": "^4.4.2",
     "socket.io": "^4.8.3",
@@ -20,6 +24,7 @@
   "packageManager": "yarn@1.22.21+sha1.1959a18351b811cdeedbd484a8f86c3cc3bbaf72",
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.10",
-    "prettier": "^3.8.3"
+    "prettier": "^3.8.3",
+    "prisma": "^7.8.0"
   }
 }
