@@ -4,7 +4,7 @@ import { Server } from "socket.io";
 import { defineEventHandler } from "h3";
 import { getRoom } from "../core/room/roomHandler";
 
-export let socketServer:Server;
+export let socketServer: Server;
 
 export default defineNitroPlugin((nitroApp: NitroApp) => {
     const engine = new Engine();
@@ -22,6 +22,7 @@ export default defineNitroPlugin((nitroApp: NitroApp) => {
         }
 
         const room = getRoom(roomId);
+        socket.join(roomId);
 
         if (room === undefined) {
             next(new Error("No valid room"));
