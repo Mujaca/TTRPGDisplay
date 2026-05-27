@@ -1,15 +1,14 @@
 import { Room } from "./room";
-import * as jwt from "jsonwebtoken";
 import { v4 } from "uuid";
 
 const rooms: Map<string, Room> = new Map();
 
-function getRoom(id: string) {
+async function getRoom(id: string): Promise<Room | undefined> {
     return rooms.get(id);
 }
 
 const id = v4();
-const room = new Room(id);
+const room = new Room(id, "name", "");
 rooms.set(id, room);
 
 export { getRoom };
