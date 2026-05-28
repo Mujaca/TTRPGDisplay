@@ -1,0 +1,39 @@
+model Room {
+  id          String   @id @unique @default(uuid())
+  name        String
+  description String
+  data        RoomData @relation(fields: [dataId], references: [id])
+  dataId      String   @unique
+}
+
+model RoomData {
+  id   String @id @unique @default(uuid())
+  room Room?
+
+  currentView String
+  image       String?
+
+  currentAudio       CurrentAudio?     @relation(fields: [currentAudioId], references: [id])
+  currentAudioId     String            @unique
+  temporaryMessage   TemporaryMessage? @relation(fields: [temporaryMessageId], references: [id])
+  temporaryMessageId String            @unique
+  loopStatus         LoopStatus        @relation(fields: [loopStatusId], references: [id])
+  loopStatusId       String            @unique
+
+  queuedAudio String[]
+}
+
+model LoopStatus {
+  id        String    @unique @default(uuid())
+  type      String
+  loopStart BigInt
+  loopEnd   BigInt
+  data      RoomData?
+}
+
+model TemporaryMessage {
+  id      String    @id @unique @default(uuid())
+  title   String
+  message String
+  data    RoomData?
+}

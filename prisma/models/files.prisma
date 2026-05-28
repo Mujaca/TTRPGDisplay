@@ -1,0 +1,14 @@
+model File {
+  id Int
+
+  @@id([id])
+}
+
+model CurrentAudio {
+  id          String @id @unique @default(uuid())
+  url         String
+  duration    String
+  currentTime BigInt
+  audioStatus String
+  data RoomData?
+}

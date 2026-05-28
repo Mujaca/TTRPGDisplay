@@ -11,5 +11,5 @@ export interface CurrentAudio extends Audio {
 export interface LoopStatus {
     type: "no-loop" | "loop-one" | "loop-timed" | "loop-playlist";
     loopStart?: number;
-    loopend?: number;
+    loopEnd?: number;
 }
