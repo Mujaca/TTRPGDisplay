@@ -18,6 +18,9 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
+  rooms Room[]
+  files File[]
+
   role       String?
   banned     Boolean?  @default(false)
   banReason  String?

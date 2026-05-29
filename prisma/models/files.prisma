@@ -1,14 +1,22 @@
 model File {
-  id Int
+    id   String @id @unique @default(uuid())
+    path String @unique
 
-  @@id([id])
+    fileName String
+    fileSize BigInt
+    fileType String
+
+    parent String?
+
+    owner   User   @relation(fields: [ownerId], references: [id])
+    ownerId String @unique
 }
 
 model CurrentAudio {
-  id          String @id @unique @default(uuid())
-  url         String
-  duration    String
-  currentTime BigInt
-  audioStatus String
-  data RoomData?
+    id          String    @id @unique @default(uuid())
+    url         String
+    duration    String
+    currentTime BigInt
+    audioStatus String
+    data        RoomData?
 }
