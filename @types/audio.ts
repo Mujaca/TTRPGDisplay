@@ -1,15 +1,15 @@
 export interface Audio {
     url: string;
-    duration: number;
+    duration: bigint;
 }
 
 export interface CurrentAudio extends Audio {
-    currentTime: number;
+    currentTime: bigint;
     audioStatus: "playing" | "paused";
 }
 
 export interface LoopStatus {
     type: "no-loop" | "loop-one" | "loop-timed" | "loop-playlist";
-    loopStart?: number;
-    loopEnd?: number;
+    loopStart?: bigint;
+    loopEnd?: bigint;
 }
