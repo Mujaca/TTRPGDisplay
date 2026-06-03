@@ -1,4 +1,3 @@
-import { Room } from "~~/server/core/room/room";
 import { getRoom, startRoom } from "~~/server/core/room/roomHandler";
 import { prisma } from "~~/server/lib/db";
 

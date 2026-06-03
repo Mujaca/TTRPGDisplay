@@ -13,6 +13,8 @@ export class Room extends EventEmitter {
     private data: RoomData = {
         currentView: "base",
         image: undefined,
+        imageName: undefined,
+        imageDescription: undefined,
         currentAudio: undefined,
         queuedAudio: [],
         loopStatus: {

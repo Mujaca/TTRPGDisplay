@@ -44,6 +44,8 @@ function createEmptyRoomData(): RoomData {
     return {
         currentView: "base",
         image: undefined,
+        imageName: undefined,
+        imageDescription: undefined,
         currentAudio: undefined,
         queuedAudio: [],
         loopStatus: {
@@ -57,6 +59,8 @@ function createEmptyRoomData(): RoomData {
 function convertDataBaseResponseToInterface(data: any): RoomData {
     return {
         image: data.image ?? undefined,
+        imageName: data.imageName ?? undefined,
+        imageDescription: data.imageDescription ?? undefined,
         queuedAudio: data.queuedAudio ?? [],
         currentView: data.currentView,
         loopStatus: {
