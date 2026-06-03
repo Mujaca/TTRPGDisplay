@@ -7,7 +7,7 @@ model Room {
     dataId String   @unique
 
     owner   User   @relation(fields: [ownerId], references: [id])
-    ownerId String @unique
+    ownerId String
 }
 
 model RoomData {
@@ -21,11 +21,11 @@ model RoomData {
     imageDescription String?
 
     currentAudio       CurrentAudio?     @relation(fields: [currentAudioId], references: [id])
-    currentAudioId     String            @unique
+    currentAudioId     String?           @unique
     temporaryMessage   TemporaryMessage? @relation(fields: [temporaryMessageId], references: [id])
-    temporaryMessageId String            @unique
+    temporaryMessageId String?           @unique
     loopStatus         LoopStatus        @relation(fields: [loopStatusId], references: [id])
-    loopStatusId       String            @unique
+    loopStatusId       String           @unique
 
     queuedAudio String[]
 }
@@ -33,8 +33,8 @@ model RoomData {
 model LoopStatus {
     id        String    @unique @default(uuid())
     type      String
-    loopStart BigInt
-    loopEnd   BigInt
+    loopStart BigInt?
+    loopEnd   BigInt?
     data      RoomData?
 }
 
