@@ -1,31 +1,31 @@
 <template>
-  <div>
-    <button @click="signIn()">Test</button>
     <div>
-      {{ accountInfo }}
+        <button @click="signIn()">Test</button>
+        <div>
+            {{ accountInfo }}
+        </div>
+        <div>
+            {{ sesionInfo }}
+        </div>
     </div>
-    <div>
-      {{ sesionInfo }}
-    </div>
-  </div>
 </template>
 
 <script lang="ts" setup>
-import { authClient } from "./lib/client-auth"; 
+import { authClient } from "./lib/client-auth";
 
 const accountInfo = ref();
 const sesionInfo = ref(authClient.useSession());
 
 onMounted(async () => {
-  accountInfo.value = await authClient.listAccounts();
-})
+    accountInfo.value = await authClient.listAccounts();
+});
 
 function signIn() {
-  authClient.signIn.social({
-    provider: "discord",
-    callbackURL: "/",
-    errorCallbackURL: "/error",
-    newUserCallbackURL: "/welcome"
-  })
+    authClient.signIn.social({
+        provider: "discord",
+        callbackURL: "/",
+        errorCallbackURL: "/error",
+        newUserCallbackURL: "/welcome",
+    });
 }
 </script>
