@@ -54,7 +54,7 @@ export default defineEventHandler(async (event) => {
             ownerId: session.user.id,
             path: uploadKey,
             fileType: contentType,
-            fileName: "",
+            fileName: fileName,
             fileSize: 0,
             parent: body.parent ?? null,
         },
