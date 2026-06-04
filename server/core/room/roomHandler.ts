@@ -85,8 +85,4 @@ function convertDataBaseResponseToInterface(data: any): RoomData {
     };
 }
 
-const id = v4();
-const room = new Room(id, "name", "");
-rooms.set(id, room);
-
 export { getRoom, startRoom };
