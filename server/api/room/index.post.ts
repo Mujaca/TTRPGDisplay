@@ -19,7 +19,6 @@ export default defineEventHandler(async (event) => {
     }
 
     const { name, description } = body;
-    console.log(name, description);
 
     if (!name || !description) {
         setResponseStatus(event, 400);

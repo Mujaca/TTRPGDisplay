@@ -24,8 +24,8 @@ model RoomData {
     currentAudioId     String?           @unique
     temporaryMessage   TemporaryMessage? @relation(fields: [temporaryMessageId], references: [id])
     temporaryMessageId String?           @unique
-    loopStatus         LoopStatus        @relation(fields: [loopStatusId], references: [id])
-    loopStatusId       String           @unique
+    loopStatus         LoopStatus?       @relation(fields: [loopStatusId], references: [id])
+    loopStatusId       String?           @unique
 
     queuedAudio String[]
 }
