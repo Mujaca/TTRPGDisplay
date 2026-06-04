@@ -15,6 +15,7 @@ export default defineEventHandler(async (event) => {
             id: true,
             name: true,
             description: true,
+            data: false,
         },
         where: {
             ownerId: session.user.id,
@@ -23,6 +24,6 @@ export default defineEventHandler(async (event) => {
 
     setResponseStatus(event, 200);
     return {
-        rooms,  
+        rooms,
     };
 });

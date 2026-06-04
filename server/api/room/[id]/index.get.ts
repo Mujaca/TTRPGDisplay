@@ -2,19 +2,19 @@ import { auth } from "~~/server/lib/auth";
 import { prisma } from "~~/server/lib/db";
 
 export default defineEventHandler(async (event) => {
-    const id = getRouterParam(event, "id");
-    if(!id) {
-        setResponseStatus(event, 400);
-        return {
-            error: "Room id is required",
-        };
-    }
-
     const session = await auth.api.getSession({ headers: event.headers });
     if (!session) {
         setResponseStatus(event, 401);
         return {
             error: "Unauthorized",
+        };
+    }
+
+    const id = getRouterParam(event, "id");
+    if(!id) {
+        setResponseStatus(event, 400);
+        return {
+            error: "Room id is required",
         };
     }
 
