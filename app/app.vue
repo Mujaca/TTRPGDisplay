@@ -7,6 +7,7 @@
         <div>
             {{ sesionInfo }}
         </div>
+        <input type="file" />
     </div>
 </template>
 

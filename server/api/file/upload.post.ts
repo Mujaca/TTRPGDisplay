@@ -23,6 +23,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const contentType = body?.contentType;
+    const contentLength = body?.contentLength;
     const fileName = body?.fileName;
 
     if (!contentType) {
@@ -39,15 +40,29 @@ export default defineEventHandler(async (event) => {
         };
     }
 
+    if (
+        !contentLength &&
+        (!Number.isInteger(contentLength) || contentLength < 0)
+    ) {
+        setResponseStatus(event, 400);
+        return {
+            error: "Content length must be a non-negative integer",
+        };
+    }
+
     const uploadKey = `users/${session.user.id}/${Date.now()}`;  
 
     const command = new PutObjectCommand({
         Bucket: S3_BUCKET,
         Key: uploadKey,
+        ContentType: contentType,
+        ...(contentLength !== undefined ? { ContentLength: contentLength } : {}),
     });
 
+    
+
     //@ts-expect-error - getSignedUrl is not typed correctly for S3Client
-    const uploadUrl = await getSignedUrl(s3, command, { expiresIn: 3600 });
+    const uploadUrl = await getSignedUrl(s3, command, { expiresIn: 3600,  });
 
     await prisma.file.create({
         data: {
@@ -55,7 +70,7 @@ export default defineEventHandler(async (event) => {
             path: uploadKey,
             fileType: contentType,
             fileName: fileName,
-            fileSize: 0,
+            fileSize: contentLength,
             parent: body.parent ?? null,
         },
     });

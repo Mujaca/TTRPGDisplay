@@ -35,6 +35,7 @@ export default defineEventHandler(async (event) => {
             fileType: "organisation/folder",
             fileSize: 1,
             parent: parent ?? null,
+            uploadStatus: "uploaded",
         },
     });
 

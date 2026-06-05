@@ -1,3 +1,4 @@
+import { mapFolderStructor } from "~~/server/core/files/fileHelper";
 import { auth } from "~~/server/lib/auth";
 import { prisma } from "~~/server/lib/db";
 
@@ -13,8 +14,8 @@ export default defineEventHandler(async (event) => {
     const files = await prisma.file.findMany({
         where: {
             ownerId: session.user.id,
-            fileSize: {
-                gt: 0,
+            uploadStatus: {
+                in: ["uploaded"],
             },
         },
         select: {
@@ -25,42 +26,10 @@ export default defineEventHandler(async (event) => {
             fileType: true,
             parent: true,
         },
+        orderBy: {
+            fileName: "asc"
+        }
     });
 
-    const mappedFiles: any = {};
-
-    for (const file of files) {
-        if (file.parent) {
-            if (!mappedFiles[file.parent]) {
-                mappedFiles[file.parent] = {
-                    id: file.parent,
-                    children: [],
-                };
-            }
-
-            mappedFiles[file.parent].children.push(mapFile(file));
-            continue;
-        }
-
-        if (!mappedFiles[file.id]) {
-            mappedFiles[file.id] = mapFile(file);
-
-            if (file.fileType === "organisation/folder") {
-                mappedFiles[file.id].children = [];
-            }
-        }
-    }
-
-    return Object.values(mappedFiles);
+    return mapFolderStructor(files);
 });
-
-// TODO fix typing
-function mapFile(file: any) {
-    return {
-        id: file.id,
-        path: file.path,
-        fileName: file.fileName,
-        fileType: file.fileType,
-        fileSize: Number(file.fileSize),
-    };
-}

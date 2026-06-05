@@ -6,6 +6,8 @@ model File {
     fileSize BigInt
     fileType String
 
+    uploadStatus String @default("pending")
+
     parent String?
 
     owner   User   @relation(fields: [ownerId], references: [id])
