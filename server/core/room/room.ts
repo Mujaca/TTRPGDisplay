@@ -1,9 +1,9 @@
-import { EventEmitter } from "events";
+import { EventEmitter2 } from "eventemitter2";
 import { Socket } from "socket.io";
 import { RoomData } from "~~/@types/room";
 import { socketServer } from "../../plugins/socket.io";
 
-export class Room extends EventEmitter {
+export class Room extends EventEmitter2 {
     public id: string;
 
     public name: string;
