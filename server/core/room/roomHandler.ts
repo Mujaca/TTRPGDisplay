@@ -1,7 +1,7 @@
 import { prisma } from "~~/server/lib/db";
 import { Room } from "./room";
-import { v4 } from "uuid";
 import { RoomData } from "~~/@types/room";
+import { socketServer } from "../../plugins/socket.io";
 
 const rooms: Map<string, Room> = new Map();
 
@@ -17,7 +17,18 @@ function startRoom(id: string, name: string, description: string) {
         room.once("startUp", () => {
             rooms.set(id, room);
             resolve(room);
-        })
+        });
+
+        room.onAny((eventName, value) => {
+            if(Array.isArray(eventName)) {
+                for(let singleEvent of eventName) {
+                    socketServer.to(room.id).emit(singleEvent, value);
+                }
+                return;
+            }
+
+            socketServer.to(room.id).emit(eventName, value);
+        });
     });
 }
 
