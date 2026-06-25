@@ -1,4 +1,4 @@
-import { EventEmitter2 } from "eventemitter2";
+import EventEmitter2 from "eventemitter2";
 import { Socket } from "socket.io";
 import { RoomData } from "~~/@types/room";
 import { socketServer } from "../../plugins/socket.io";
@@ -33,7 +33,7 @@ export class Room extends EventEmitter2 {
         const room = new Room(id, name, description);
         room.data = dataObject;
 
-        console.log(`Loaded data for room with id ${id}`)
+        console.log(`Loaded data for room with id ${id}`);
         room.startRoom();
         return room;
     }
@@ -63,11 +63,11 @@ export class Room extends EventEmitter2 {
     private syncMusic() {
         if (this.data.currentAudio === undefined) return;
 
-        socketServer.to(this.id).emit("music-sync", {
+        this.emit("music-sync", {
             currentTime: this.data.currentAudio.currentTime,
             audioStatus: this.data.currentAudio.audioStatus,
         });
-    }
+     }
 
     private shutdownRoom() {
         clearInterval(this.updateIntervallId);

@@ -4,24 +4,34 @@ import { RoomData } from "~~/@types/room";
 import { socketServer } from "../../plugins/socket.io";
 
 const rooms: Map<string, Room> = new Map();
+const lockedForStartUp: string[] = [];
 
 async function getRoom(id: string): Promise<Room | undefined> {
+    const room = await getRoomFromDb(id);
+    if (room && !lockedForStartUp.includes(id)) {
+        lockedForStartUp.push(id);
+        return await startRoom(id, room.name, room.description);
+    }
+
     return rooms.get(id);
 }
 
-function startRoom(id: string, name: string, description: string) {
+function startRoom(
+    id: string,
+    name: string,
+    description: string,
+): Promise<Room> {
     return new Promise(async (resolve) => {
         const roomData = await getRoomDataFromDb(id);
         const room = Room.desirialiseRoom(id, name, description, roomData);
 
         room.once("startUp", () => {
             rooms.set(id, room);
-            resolve(room);
         });
 
         room.onAny((eventName, value) => {
-            if(Array.isArray(eventName)) {
-                for(let singleEvent of eventName) {
+            if (Array.isArray(eventName)) {
+                for (let singleEvent of eventName) {
                     socketServer.to(room.id).emit(singleEvent, value);
                 }
                 return;
@@ -29,6 +39,9 @@ function startRoom(id: string, name: string, description: string) {
 
             socketServer.to(room.id).emit(eventName, value);
         });
+
+        lockedForStartUp.splice(lockedForStartUp.indexOf(id), 1)
+        resolve(room);
     });
 }
 
@@ -49,6 +62,26 @@ async function getRoomDataFromDb(id: string): Promise<RoomData> {
     }
 
     return convertDataBaseResponseToInterface(roomData);
+}
+
+async function getRoomFromDb(id: string) {
+    const room = await prisma.room.findUnique({
+        where: {
+            id: id,
+        },
+    });
+
+    return room;
+}
+
+async function isRoomInDb(id: string): Promise<boolean> {
+    const roomCount = await prisma.room.count({
+        where: {
+            id,
+        },
+    });
+
+    return roomCount > 0;
 }
 
 function createEmptyRoomData(): RoomData {
@@ -96,4 +129,4 @@ function convertDataBaseResponseToInterface(data: any): RoomData {
     };
 }
 
-export { getRoom, startRoom };
+export { getRoom, startRoom, isRoomInDb, getRoomDataFromDb };

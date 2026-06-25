@@ -13,7 +13,7 @@ export default defineNitroPlugin((nitroApp: NitroApp) => {
 
     io.bind(engine);
 
-    io.use((socket, next) => {
+    io.use(async (socket, next) => {
         const roomId = socket.handshake.query.room;
 
         if (roomId === undefined || typeof roomId !== "string") {
@@ -21,7 +21,7 @@ export default defineNitroPlugin((nitroApp: NitroApp) => {
             return;
         }
 
-        const room = getRoom(roomId);
+        const room = await getRoom(roomId);
         socket.join(roomId);
 
         if (room === undefined) {
