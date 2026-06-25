@@ -40,7 +40,7 @@ function startRoom(
             socketServer.to(room.id).emit(eventName, value);
         });
 
-        lockedForStartUp.splice(lockedForStartUp.indexOf(id), 1)
+        lockedForStartUp.splice(lockedForStartUp.indexOf(id), 1);
         resolve(room);
     });
 }
@@ -48,7 +48,9 @@ function startRoom(
 async function getRoomDataFromDb(id: string): Promise<RoomData> {
     const roomData = await prisma.roomData.findFirst({
         where: {
-            id,
+            room: {
+                id,
+            },
         },
         include: {
             currentAudio: true,
@@ -82,6 +84,10 @@ async function isRoomInDb(id: string): Promise<boolean> {
     });
 
     return roomCount > 0;
+}
+
+function removeRoom(id: string): void {
+    rooms.delete(id);
 }
 
 function createEmptyRoomData(): RoomData {
@@ -129,4 +135,4 @@ function convertDataBaseResponseToInterface(data: any): RoomData {
     };
 }
 
-export { getRoom, startRoom, isRoomInDb, getRoomDataFromDb };
+export { getRoom, startRoom, isRoomInDb, getRoomDataFromDb, removeRoom };
