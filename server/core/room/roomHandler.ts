@@ -118,11 +118,12 @@ function convertDataBaseResponseToInterface(data: any): RoomData {
             loopStart: data.loopStatus.loopStart ?? undefined,
             loopEnd: data.loopStatus.loopEnd ?? undefined,
         },
+        //@ts-expect-error typing
         currentAudio: data.currentAudio
             ? {
                   audioStatus: data.currentAudio.audioStatus,
-                  currentTime: data.currentAudio.currentTime,
-                  duration: data.currentAudio.duration,
+                  currentTime: parseInt(data.currentAudio.currentTime),
+                  duration: parseInt(data.currentAudio.duration),
                   url: data.currentAudio.url,
               }
             : undefined,

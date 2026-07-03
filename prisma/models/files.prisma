@@ -17,7 +17,7 @@ model File {
 model CurrentAudio {
     id          String    @id @unique @default(uuid())
     url         String
-    duration    String
+    duration    BigInt
     currentTime BigInt
     audioStatus String
     data        RoomData?
