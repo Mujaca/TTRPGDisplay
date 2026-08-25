@@ -9,6 +9,7 @@ model File {
     uploadStatus String @default("pending")
 
     parent String?
+    sharedFile SharedFile[]
 
     owner   User   @relation(fields: [ownerId], references: [id])
     ownerId String
@@ -21,4 +22,12 @@ model CurrentAudio {
     currentTime BigInt
     audioStatus String
     data        RoomData?
+}
+
+model SharedFile {
+    id  String @id @unique @default(uuid())
+    file File   @relation(fields: [fileId], references: [id])
+    fileId String @unique
+
+    url String @unique
 }

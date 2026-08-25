@@ -5,7 +5,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 
 export const fileCache = new NodeCache({
-    stdTTL: 60 * 60, // 1 hour
+    stdTTL: 60 * 60 * 12, // 12 hours
     checkperiod: 60 * 10, // 10 minutes
     useClones: false,
     deleteOnExpire: true,
@@ -32,7 +32,21 @@ export async function getFileUrl(fileId: string): Promise<string | null> {
     });
 
     // @ts-expect-error
-    const url = await getSignedUrl(s3, command, { expiresIn: 60 * 60 }); // URL valid for 1 hour
+    const url = await getSignedUrl(s3, command, { expiresIn: 60 * 60 * 12 }); // URL valid for 12 hour
     fileCache.set(fileId, url);
+
+    await prisma.sharedFile.upsert({
+        where: { fileId },
+        update: { url },
+        create: {
+            url,
+            file: {
+                connect: {
+                    id: fileId,
+                },
+            },
+        },
+    });
+
     return url;
 }

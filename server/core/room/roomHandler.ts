@@ -23,7 +23,7 @@ function startRoom(
 ): Promise<Room> {
     return new Promise(async (resolve) => {
         const roomData = await getRoomDataFromDb(id);
-        const room = Room.desirialiseRoom(id, name, description, roomData);
+        const room = await Room.desirialiseRoom(id, name, description, roomData);
 
         room.once("startUp", () => {
             rooms.set(id, room);

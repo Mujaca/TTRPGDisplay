@@ -1,3 +1,5 @@
+import { prisma } from "../../lib/db";
+
 // TODO fix typing
 export function mapFile(file: any) {
     return {
@@ -32,4 +34,19 @@ export function mapFolderStructor(files: any[], folder: string = "") {
     ];
 
     return mappedFiles;
+}
+
+export async function getFileByUrl(url: string) {
+    const file = await prisma.sharedFile.findUnique({
+        where: {
+            url,
+        },
+        include: {
+            file: true,
+        },
+    });
+
+    if (!file) return null;
+
+    return file.file;
 }

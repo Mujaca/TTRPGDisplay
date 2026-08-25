@@ -3,6 +3,8 @@ import { Socket } from "socket.io";
 import { RoomData } from "~~/@types/room";
 import { removeRoom } from "./roomHandler";
 import { prisma } from "../../lib/db";
+import { getFileByUrl } from "../files/fileHelper";
+import { getFileUrl } from "../files/fileCache";
 
 export class Room extends EventEmitter2 {
     public id: string;
@@ -28,17 +30,17 @@ export class Room extends EventEmitter2 {
     private updateIntervallId: NodeJS.Timeout;
     //private shutdownTimeout: NodeJS.Timeout;
 
-    public static desirialiseRoom(
+    public static async desirialiseRoom(
         id: string,
         name: string,
         description: string,
         dataObject: RoomData,
-    ): Room {
+    ): Promise<Room> {
         const room = new Room(id, name, description);
         room.data = dataObject;
 
         console.log(`Loaded data for room with id ${id}`);
-        room.startRoom();
+        await room.startRoom();
         return room;
     }
 
@@ -49,10 +51,11 @@ export class Room extends EventEmitter2 {
         this.description = description;
 
         console.log(`Started room with id ${this.id}`);
-        this.updateIntervallId = setInterval(() => this.syncMusic(), 3000);
+        this.updateIntervallId = setInterval(() => this.syncMusic(), 1000);
     }
 
     async startRoom() {
+        await this.refreshMusicLink();
         // startUp room
         this.emit("startUp", this.data);
     }
@@ -66,7 +69,22 @@ export class Room extends EventEmitter2 {
         );
     }
 
-    private async saveDataChange(skipAudioTime: boolean = true) {
+    private async fetchDatabaseIds() {
+        if (!this.databaseIdMap.has("roomDataId")) {
+            const roomData = await prisma.roomData.findFirst({
+                select: {
+                    id: true,
+                },
+                where: {
+                    id: this.id,
+                },
+            });
+
+            if (roomData?.id) {
+                this.databaseIdMap.set("roomDataId", roomData?.id);
+            }
+        }
+
         if (!this.databaseIdMap.has("loopStatusId")) {
             const loopStatus = await prisma.loopStatus.findFirst({
                 select: {
@@ -85,16 +103,165 @@ export class Room extends EventEmitter2 {
                 this.databaseIdMap.set("loopStatusId", loopStatus?.id);
             }
         }
+
+        if (!this.databaseIdMap.has("temporaryMessageId")) {
+            const temporaryMessage = await prisma.temporaryMessage.findFirst({
+                select: {
+                    id: true,
+                },
+                where: {
+                    data: {
+                        room: {
+                            id: this.id,
+                        },
+                    },
+                },
+            });
+
+            if (temporaryMessage?.id) {
+                this.databaseIdMap.set(
+                    "temporaryMessageId",
+                    temporaryMessage?.id,
+                );
+            }
+        }
+
+        if (!this.databaseIdMap.has("currentAudioId")) {
+            const currentAudio = await prisma.currentAudio.findFirst({
+                select: {
+                    id: true,
+                },
+                where: {
+                    data: {
+                        room: {
+                            id: this.id,
+                        },
+                    },
+                },
+            });
+
+            if (currentAudio?.id) {
+                this.databaseIdMap.set("currentAudioId", currentAudio?.id);
+            }
+        }
+    }
+
+    private async saveDataChange(skipAudioTime: boolean = true) {
+        await this.fetchDatabaseIds();
+
+        await prisma.roomData.update({
+            where: {
+                id: this.databaseIdMap.get("roomDataId")!,
+            },
+            data: {
+                currentView: this.data.currentView,
+                image: this.data.image,
+                imageName: this.data.imageName,
+                imageDescription: this.data.imageDescription,
+                queuedAudio: this.data.queuedAudio,
+            },
+        });
+
+        await prisma.loopStatus.update({
+            where: {
+                id: this.databaseIdMap.get("loopStatusId")!,
+            },
+            data: {
+                type: this.data.loopStatus.type,
+                currentTime: skipAudioTime
+                    ? undefined
+                    : this.data.currentAudio?.currentTime,
+                audioStatus: skipAudioTime
+                    ? undefined
+                    : this.data.currentAudio?.audioStatus,
+                url: skipAudioTime ? undefined : this.data.currentAudio?.url,
+            },
+        });
+
+        await prisma.temporaryMessage.update({
+            where: {
+                id: this.databaseIdMap.get("temporaryMessageId")!,
+            },
+            data: {
+                message: this.data.temporaryMessage?.message,
+                title: this.data.temporaryMessage?.title,
+            },
+        });
+
+        if (!skipAudioTime) {
+            await prisma.currentAudio.update({
+                where: {
+                    id: this.databaseIdMap.get("currentAudioId")!,
+                },
+                data: {
+                    currentTime: this.data.currentAudio?.currentTime,
+                    audioStatus: this.data.currentAudio?.audioStatus,
+                    url: this.data.currentAudio?.url,
+                },
+            });
+        }
     }
 
     private syncMusic() {
         if (this.data.currentAudio === undefined) return;
+        this.handleMusicTicket();
 
         this.emit("music-sync", {
             currentTime: this.data.currentAudio.currentTime,
             audioStatus: this.data.currentAudio.audioStatus,
             url: this.data.currentAudio.url,
         });
+    }
+
+    private handleMusicTicket() {
+        if (this.data.currentAudio === undefined) return;
+
+        this.data.currentAudio.currentTime++;
+        const loopStatus = this.data.loopStatus;
+        const loopEnd = loopStatus.loopEnd ?? this.data.currentAudio.duration;
+
+        let override = false;
+        if (this.data.currentAudio.currentTime >= loopEnd) {
+            this.data.currentAudio.currentTime = BigInt(
+                loopStatus.loopStart ?? 0,
+            );
+
+            switch (loopStatus.type) {
+                case "loop-one":
+                    // Current Song is already playing, no reason to change it
+                    break;
+                case "loop-playlist":
+                    this.data.queuedAudio.push(this.data.currentAudio.url);
+                    break;
+                case "no-loop":
+                    if (this.data.queuedAudio.length > 0) {
+                        this.data.currentAudio.url =
+                            this.data.queuedAudio.shift()!;
+                        this.data.currentAudio.currentTime = BigInt(0);
+                    } else {
+                        this.data.currentAudio.audioStatus = "paused";
+                    }
+                    break;
+            }
+            override = true;
+        }
+
+        // Save time every 60 seconds or when something changed
+        this.saveDataChange(
+            override
+                ? true
+                : this.data.currentAudio.currentTime % BigInt(60) === BigInt(0),
+        );
+    }
+
+    private async refreshMusicLink() {
+        if(this.data.currentAudio === undefined || this.data.currentAudio.url === undefined) return;
+        const file = await getFileByUrl(this.data.currentAudio!.url);
+
+        if(!file) return;
+
+        const newFileUrl = await getFileUrl(file.id);
+        return newFileUrl;
     }
 
     private shutdownRoom() {
