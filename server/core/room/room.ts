@@ -6,6 +6,15 @@ import { prisma } from "../../lib/db";
 import { getFileByUrl } from "../files/fileHelper";
 import { getFileUrl } from "../files/fileCache";
 
+/**
+ * Available events:
+ * - startUp: Emitted when the room is started up and ready to use
+ * - data-update: Emitted when the room data is updated, contains the updated fields and data
+ * - music-sync: Emitted every second to sync the music for all clients, contains currentTime, audioStatus and url
+ * - music-update: Emitted when the music is paused or played, contains audioStatus
+ * - queue-update: Emitted when the queue is updated, contains queuedAudio
+ * - shutdown: Emitted when the room is shut down
+ */
 export class Room extends EventEmitter2 {
     public id: string;
 
@@ -67,6 +76,65 @@ export class Room extends EventEmitter2 {
         socket.on("disconnect", () =>
             this.connections.splice(this.connections.indexOf(socket), 1),
         );
+    }
+
+    public updateFields(updateData: Partial<RoomData>) {
+        this.data = { ...this.data, ...updateData };
+        const updatedFields = Object.keys(updateData);
+
+        this.emit("data-update", {
+            updatedFields,
+            data: updateData,
+        });
+    }
+
+    public skipMusic(newTime: bigint) {
+        if (this.data.currentAudio === undefined) return;
+
+        this.data.currentAudio.currentTime = newTime;
+        this.saveDataChange(false);
+        this.emit("music-sync", {
+            currentTime: this.data.currentAudio.currentTime,
+            audioStatus: this.data.currentAudio.audioStatus,
+            url: this.data.currentAudio.url,
+        });
+    }
+
+    public pauseMusic() {
+        if(!this.data.currentAudio) return;
+
+        this.data.currentAudio.audioStatus === "paused";
+        this.emit("music-update", {
+            audioStatus: this.data.currentAudio.audioStatus
+        })
+    }
+
+    public playMusic() {
+        if(!this.data.currentAudio) return;
+
+        this.data.currentAudio.audioStatus === "playing";
+        this.emit("music-update", {
+            audioStatus: this.data.currentAudio.audioStatus
+        })
+    }
+
+    public addToQueue(url: string) {
+        this.data.queuedAudio.push(url);
+        this.saveDataChange();
+        this.emit("queue-update", {
+            queuedAudio: this.data.queuedAudio,
+        });
+    }
+
+    public removeFromQueue(url: string) {
+        const index = this.data.queuedAudio.indexOf(url);
+        if (index > -1) {
+            this.data.queuedAudio.splice(index, 1);
+            this.saveDataChange();
+            this.emit("queue-update", {
+                queuedAudio: this.data.queuedAudio,
+            });
+        }
     }
 
     private async fetchDatabaseIds() {
