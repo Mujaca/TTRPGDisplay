@@ -5,12 +5,17 @@ import { socketServer } from "../../plugins/socket.io";
 
 const rooms: Map<string, Room> = new Map();
 const lockedForStartUp: string[] = [];
+const roomOwnerMap: Map<string, string> = new Map();
 
 async function getRoom(id: string): Promise<Room | undefined> {
     const room = await getRoomFromDb(id);
     if (room && !lockedForStartUp.includes(id)) {
         lockedForStartUp.push(id);
         return await startRoom(id, room.name, room.description);
+    }
+
+    if(!roomOwnerMap.has(id)) {
+        roomOwnerMap.set(id, room?.ownerId ?? "");
     }
 
     return rooms.get(id);
@@ -43,6 +48,20 @@ function startRoom(
         lockedForStartUp.splice(lockedForStartUp.indexOf(id), 1);
         resolve(room);
     });
+}
+
+async function findRoomOwner(id: string): Promise<string | undefined> {
+    if(roomOwnerMap.has(id)) {
+        return roomOwnerMap.get(id);
+    }
+
+    const room = await getRoomFromDb(id);
+    if(room) {
+        roomOwnerMap.set(id, room.ownerId);
+        return room.ownerId;
+    }
+
+    return undefined;
 }
 
 async function getRoomDataFromDb(id: string): Promise<RoomData> {
@@ -136,4 +155,4 @@ function convertDataBaseResponseToInterface(data: any): RoomData {
     };
 }
 
-export { getRoom, startRoom, isRoomInDb, getRoomDataFromDb, removeRoom };
+export { getRoom, startRoom, isRoomInDb, getRoomDataFromDb, removeRoom, findRoomOwner };
