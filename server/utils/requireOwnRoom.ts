@@ -26,17 +26,19 @@ export const defineRequireOwnRoomHandler = <T extends EventHandlerRequest, D>(
 
             const roomOwner = await findRoomOwner(id);
             if (!roomOwner && session.user.role !== "admin") {
-                setResponseStatus(event, 404);
+                setResponseStatus(event, 403);
                 return {
-                    error: "Room not found",
+                    error: "You do not have permission to access this room",
                 };
             }
 
             const response = await handler(event);
-            
+
             return { response };
         } catch (err) {
-            // Error handling
-            return { err };
+            setResponseStatus(event, 500);
+            return {
+                error: "Internal server error",
+            };
         }
     });
