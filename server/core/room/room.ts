@@ -78,6 +78,10 @@ export class Room extends EventEmitter2 {
         );
     }
 
+    public serializeData(): RoomData {
+        return this.data;
+    }
+
     public updateFields(updateData: Partial<RoomData>) {
         this.data = { ...this.data, ...updateData };
         const updatedFields = Object.keys(updateData);
