@@ -1,3 +1,4 @@
+import { getFileUrl } from "../../../../core/files/fileCache";
 import { getRoom } from "../../../../core/room/roomHandler";
 
 export default defineRequireOwnRoomHandler(async (event) => {
@@ -15,7 +16,15 @@ export default defineRequireOwnRoomHandler(async (event) => {
         };
     }
 
-    room?.addToQueue(audio);
+    const audioFile = await getFileUrl(audio);
+    if(!audioFile) {
+        setResponseStatus(event, 400);
+        return {
+            error: "Audio not found",
+        };
+    }
+
+    room?.addToQueue(audioFile);
 
     return room?.serializeData();
 });

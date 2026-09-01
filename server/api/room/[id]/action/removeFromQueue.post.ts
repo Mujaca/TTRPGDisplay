@@ -1,0 +1,20 @@
+import { getRoom } from "../../../../core/room/roomHandler";
+
+export default defineRequireOwnRoomHandler(async (event) => {
+    // Validated by defineRequireOwnRoomHandler, so we can safely assert that id is not null
+    const id = getRouterParam(event, "id")!;
+    const room = await getRoom(id);
+
+    const body = await readBody(event);
+    const { audio } = body;
+
+    if (!audio || typeof audio !== "string") {
+        setResponseStatus(event, 400);
+        return {
+            error: "Audio url is required",
+        };
+    }
+
+    room?.removeFromQueue(audio);
+    return room?.serializeData();
+})
