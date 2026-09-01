@@ -1,3 +1,4 @@
+
 generator client {
   provider = "prisma-client"
   output   = "./generated"
@@ -64,8 +65,11 @@ model Account {
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
+  issuer String
+
   @@index([userId])
   @@map("account")
+  @@unique([issuer, accountId], map: "account_issuer_accountId_uidx")
 }
 
 model Verification {
