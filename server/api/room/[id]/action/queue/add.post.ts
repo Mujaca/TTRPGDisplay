@@ -1,5 +1,5 @@
-import { getFileUrl } from "../../../../core/files/fileCache";
-import { getRoom } from "../../../../core/room/roomHandler";
+import { getFileUrl } from "../../../../../core/files/fileCache";
+import { getRoom } from "../../../../../core/room/roomHandler";
 
 export default defineRequireOwnRoomHandler(async (event) => {
     // Validated by defineRequireOwnRoomHandler, so we can safely assert that id is not null
