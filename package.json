@@ -29,6 +29,7 @@
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.10",
     "prettier": "^3.8.3",
-    "prisma": "^7.8.0"
+    "prisma": "^7.8.0",
+    "sass-embedded": "^1.103.1"
   }
 }

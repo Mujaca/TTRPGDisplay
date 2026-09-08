@@ -1,32 +1,24 @@
 <template>
-    <div>
-        <button @click="signIn()">Test</button>
-        <div>
-            {{ accountInfo }}
+    <NuxtLayout>
+        <NuxtPage />
+        <div class="disclaimer">
+            Die Layouts wurden mit Hilfe von KI erstellt. Sie sind nicht final und dienen nur als Inspiration.
         </div>
-        <div>
-            {{ sesionInfo }}
-        </div>
-        <input type="file" />
-    </div>
+    </NuxtLayout>
 </template>
 
 <script lang="ts" setup>
-import { authClient } from "./lib/client-auth";
-
-const accountInfo = ref();
-const sesionInfo = ref(authClient.useSession());
-
-onMounted(async () => {
-    accountInfo.value = await authClient.listAccounts();
-});
-
-function signIn() {
-    authClient.signIn.social({
-        provider: "discord",
-        callbackURL: "/",
-        errorCallbackURL: "/error",
-        newUserCallbackURL: "/welcome",
-    });
-}
 </script>
+
+<style lang="scss">
+.disclaimer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    text-align: center;
+    padding: 10px;
+}
+</style>
