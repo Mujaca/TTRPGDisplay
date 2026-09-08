@@ -8,7 +8,7 @@ export const auth = betterAuth({
     experimental: {
         joins: true,
     },
-    baseURL: "http://localhost:3000/",
+    baseURL: process.env.BETTER_AUTH_URL,
     emailAndPassword: { enabled: true },
     socialProviders: {
         discord: {
